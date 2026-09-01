@@ -1,6 +1,18 @@
-<% content_for :title, "Rails開発チュートリアル" %>
-<!-- Hello World -->
-<h1>List Views</h1>
+<% content_for :title, "未確定一覧" %>
+<div class="mb-4">
+  <p class="mb-1 text-primary fw-semibold">
+    勤務調整
+  </p>
+
+  <h1 class="display-6 fw-bold">
+    未確定依頼一覧
+  </h1>
+
+  <p class="page-lead text-body-secondary">
+    依頼内容と現在の割当状況を確認できます。
+  </p>
+</div>
+
 <% if @work_requests.any? %>
   <div class="row g-4">
     <% @work_requests.each do |work_request| %>
