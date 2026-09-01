@@ -57,17 +57,16 @@
           >
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <%= link_to "一覧表",
-                            list_views_path,
-                            class: "nav-link" %>
-              </li>
-
-              <li class="nav-item">
-                <%= link_to "勤務依頼",
+                <%= link_to "全一覧",
                             work_requests_path,
                             class: "nav-link" %>
               </li>
 
+              <li class="nav-item">
+                <%= link_to "未確定一覧",
+                            list_views_path,
+                            class: "nav-link" %>
+              </li>
               <li class="nav-item">
                 <%= link_to "スタッフ",
                             staff_members_path,
