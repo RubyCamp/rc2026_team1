@@ -30,3 +30,6 @@
 
 # Ruby LSP generated files
 /.ruby-lsp
+
+# Local explanation materials
+/explanation/

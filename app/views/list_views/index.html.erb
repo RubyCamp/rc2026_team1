@@ -1,4 +1,4 @@
-<% content_for :title, "未確定一覧" %>
+<% content_for :title, "仮割り当て一覧" %>
 
 <div class="mb-4">
   <p class="mb-1 text-primary fw-semibold">
@@ -6,173 +6,86 @@
   </p>
 
   <h1 class="display-6 fw-bold">
-    未確定依頼一覧
+    仮割り当て一覧
   </h1>
 
   <p class="page-lead text-body-secondary">
-    依頼内容と現在の割当状況を確認できます。
+    仮割り当て中のスタッフと勤務依頼を確認できます。
   </p>
 </div>
 
-<div class="container">
-  <div class="row align-items-start">
-    <div class="col-sm-8">
-<% if @work_requests.any? %>
+<% if @assignments.any? %>
   <div class="row g-4">
-    <% @work_requests.each do |work_request| %>
-      <div class="col-12 col-md-6 col-xl-4">
+    <% @assignments.each do |assignment| %>
+      <% staff_member = assignment.staff_member %>
+      <% work_request = assignment.work_request %>
+      <% skill_missing = !StaffMember
+        .skilled_for(work_request_id: work_request.id)
+        .exists?(id: staff_member.id) %>
+      <% unavailable = !StaffMember
+        .available_during(work_request_id: work_request.id)
+        .exists?(id: staff_member.id) %>
+
+      <div class="col-12 col-md-6">
         <article
-  class="card work-request-card h-100 shadow-sm"
-  style="border-top: 0.25rem solid <%= work_request.required_staff_count > work_request.assignments.size || !work_request.staff_members.available_during(work_request_id: work_request.id).any? ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
->
+          class="card h-100 shadow-sm"
+          style="border-top: 0.25rem solid <%= skill_missing || unavailable ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
+        >
           <div class="card-body">
-            <div
-              class="
-                d-flex
-                justify-content-between
-                align-items-center
-                gap-3
-                mb-3
-              "
-            >
-              <span class="badge text-bg-primary">
-                <%= enum_label(work_request, :status) %>
+            <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+              <span class="badge text-bg-secondary">
+                <%= enum_label(staff_member, :employment_status) %>
               </span>
 
               <small class="text-body-secondary">
-                <%= l work_request.starts_at,
-                      format: :short %>
-                    </small>
-                  </div>
+                <%= l work_request.starts_at, format: :short %>
+              </small>
+            </div>
 
-                  <h2 class="h5 card-title">
-                    <%= link_to(
-                    work_request.title,
-                    work_request,
-                    class: "link-dark stretched-link"
-                  ) %>
-                  </h2>
+            <h2 class="h5 card-title">
+              <%= staff_member.name %>
+            </h2>
 
-                  <dl class="definition-list mb-0">
-                    <div>
-                      <dt>事業者</dt>
-                      <dd><%= work_request.business.name %></dd>
-                    </div>
+            <dl class="definition-list mb-0">
+              <div>
+                <dt>勤務依頼</dt>
+                <dd><%= link_to work_request.title, work_request %></dd>
+              </div>
 
-                    <div>
-                      <dt>必要人数</dt>
+              <div>
+                <dt>事業者</dt>
+                <dd><%= work_request.business.name %></dd>
+              </div>
 
-                      <dd>
-                        <%= work_request.required_staff_count %>名
-                      </dd>
-                    </div>
+              <div>
+                <dt>必要スキル</dt>
+                <dd><%= work_request.required_skill.name %></dd>
+              </div>
 
-                    <div>
-                      <dt>割当済み</dt>
-
-                      <dd>
-                        <%= work_request.assignments.size %>名
-                      </dd>
-                    </div>
-
-                    <div>
-                      <dt>必要スキル</dt>
-
-                      <dd>
-                        <%= work_request.required_skill&.name ||
-                      "指定なし" %>
-                      </dd>
-                    </div>
-
-                    <div>
-                      <dt>スタッフスキル</dt>
-
-                      <dd>
-                        <% work_request.staff_members.each do |staff_member| %>
-                          <%= staff_member.skills.map(&:name)
-                        .join("、")
-                        .presence || "なし" %>
-                        <% end %>
+              <div>
+                <dt>スタッフスキル</dt>
+                <dd>
+                  <%= staff_member.skills.map(&:name).join("、").presence || "なし" %>
                 </dd>
               </div>
-              <% a = [] %>
-              <% a << "人手不足" if work_request.required_staff_count != work_request.assignments.size %>
-              <% a << "勤務不可能" unless work_request.staff_members.available_during(work_request_id: work_request.id).any? %>
-              <% a << "スキル不足" unless work_request.skills.map(&:id).include?(work_request.required_skill_id) %>
-              <div class="text-danger">
-                <%= a.join("、") %>
-              </div>
-
             </dl>
-            <%#= button_to "確定済み", {} %>
+
+            <% warnings = [] %>
+            <% warnings << "勤務不可能" if unavailable %>
+            <% warnings << "スキル不足" if skill_missing %>
+
+            <% if warnings.any? %>
+              <div class="text-danger">
+                <%= warnings.join("、") %>
+              </div>
+            <% end %>
           </div>
         </article>
       </div>
     <% end %>
   </div>
 <% else %>
-      <div class="alert alert-info">
-        勤務依頼はまだ登録されていません。
-      </div>
-<% end %>
-    </div>
-
-    <div class="col">
-      <% if @staff_members.any? %>
-        <div class="row g-4">
-          <% @staff_members.each do |staff_member| %>
-            <div class="col-12 col-md-6">
-              <article class="card h-100 shadow-sm">
-                <div class="card-body">
-                  <span class="badge text-bg-secondary mb-3">
-                    <%= enum_label(
-                    staff_member,
-                    :employment_status
-                  ) %>
-                  </span>
-
-                  <h2 class="h5 card-title">
-                    <%= staff_member.name %>
-                  </h2>
-
-                  <dl class="definition-list mb-0">
-                    <div>
-                      <dt>スキル</dt>
-
-                      <dd>
-                        <%= staff_member.skills
-                        .map(&:name)
-                        .join("、")
-                        .presence || "なし" %>
-                      </dd>
-                    </div>
-
-                    <div>
-                      <dt>勤務予定</dt>
-
-                      <dd>
-                        <%= staff_member.availabilities
-                        .map do |availability|
-                          enum_label(
-                            availability,
-                            :status
-                          )
-                        end
-                        .join("、")
-                        .presence || "未登録" %>
-                      </dd>
-                    </div>
-                  </dl>
-                </div>
-              </article>
-            </div>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="alert alert-info">
-          スタッフはまだ登録されていません。
-        </div>
-      <% end %>
-    </div>
+  <div class="alert alert-info">
+    仮割り当てはありません。
   </div>
-</div>
+<% end %>
