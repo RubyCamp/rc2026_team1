@@ -21,9 +21,9 @@
     <% @work_requests.each do |work_request| %>
       <div class="col-12 col-md-6 col-xl-4">
         <article
-          class="card work-request-card h-100 shadow-sm"
-          style="border-top: 0.25rem solid var(--bs-danger);"
-        >
+  class="card work-request-card h-100 shadow-sm"
+  style="border-top: 0.25rem solid <%= work_request.required_staff_count > work_request.assignments.size ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
+>
           <div class="card-body">
             <div
               class="
