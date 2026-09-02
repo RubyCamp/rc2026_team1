@@ -23,7 +23,7 @@
       <div class="col-12 col-md-6 col-xl-4">
         <article
   class="card work-request-card h-100 shadow-sm"
-  style="border-top: 0.25rem solid <%= work_request.required_staff_count > work_request.assignments.size ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
+  style="border-top: 0.25rem solid <%= work_request.required_staff_count > work_request.assignments.size || !work_request.staff_members.available_during(work_request_id: work_request.id).any? ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
 >
           <div class="card-body">
             <div
