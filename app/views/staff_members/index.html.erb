@@ -62,7 +62,7 @@
                       class="btn btn-outline-primary btn-sm w-100"
                       data-bs-toggle="modal"
                       data-bs-target="#shiftModal-<%= staff_member.id %>">
-                      シフトカレンダーを見る
+                      シフトを見る
               </button>
             </div>
           </div>
@@ -77,50 +77,26 @@
                   </button>
                 </div>
                 <div class="modal-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered text-center aligh-middle mb-0">
-                      <thead class="table-light">
-                        <tr>
-                          <th class="text-danger">日
-                          </th>
-                          <th>月
-                          </th>
-                          <th>火
-                          </th>
-                          <th>水
-                          </th>
-                          <th>木
-                          </th>
-                          <th>金
-                          </th>
-                          <th class="text-primary">土
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr style="height: 80px;">
-                          <td class"text-secondary aligh-top text-start fs-7">1
-                          </td>
-                          <td class"text-secondary aligh-top text-start fs-7">2
-                          </td>
-                          <td class"text-secondary aligh-top text-start fs-7">3
-                            <span class="badge bg-success-subtle text-success border border-success d-block mt-1">出勤
-                            </span>
-                          </td>
-                          <td class="text-secondary align-top text-start fs-7">4
-                          </td>
-                          <td class="text-secondary align-top text-start fs-7">5
-                            <span class="badge bg-success-subtle text-success border border-success d-block mt-1">出勤
-                            </span>
-                          </td>
-                          <td class="text-secondary align-top text-start fs-7">6
-                          </td>
-                          <td class="text-secondary align-top text-start fs-7">7
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                  <% if staff_member.availabilities.any? %>
+                  <div class="list-group">
+                    <% Availability.for_staff(staff_member_id: staff_member.id).each do |availability| %>
+                      <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                          <span class="badge text-bg-secondary me-2">
+                            <%= enum_label(availability, :status) %>
+                          </span>
+                          <strong><%= availability.starts_at.strftime("%Y/%m/%d") %></strong>
+                        </div>
+                        <span class="text-body-secondary small">
+                          <%= availability.starts_at.strftime("%H:%M") %> ~ <%= availability.ends_at.strftime("%H:%M") %>
+                        </span>
+                      </div>
+                    <% end %>
                   </div>
+                  <% else %>
+                  <p class="text-muted mb-0">勤務予定はまだ登録されていません。
+                  </p>
+                  <% end %>
                 </div>
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる
