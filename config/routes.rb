@@ -18,7 +18,9 @@ Rails.application.routes.draw do
 
   resources :work_requests, only: %i[index show edit update]
   resources :staff_members, only: [ :index ]
-  resources :list_views, only: [ :index ]
+  resources :list_views, only: [ :index ] do
+    patch :confirm, on: :member
+  end
   get "examples/local-data",
     to: "examples#local_data",
     as: :examples_local_data

@@ -1,4 +1,4 @@
-<% content_for :title, "仮割り当て一覧" %>
+<% content_for :title, "確定済み一覧" %>
 
 <div class="mb-4">
   <p class="mb-1 text-primary fw-semibold">
@@ -6,11 +6,11 @@
   </p>
 
   <h1 class="display-6 fw-bold">
-    仮割り当て一覧
+    確定済み一覧
   </h1>
 
   <p class="page-lead text-body-secondary">
-    仮割り当て中のスタッフと勤務依頼を確認できます。
+    確定済みのスタッフと勤務依頼を確認できます。
   </p>
 </div>
 
@@ -19,16 +19,11 @@
     <% @assignments.each do |assignment| %>
       <% staff_member = assignment.staff_member %>
       <% work_request = assignment.work_request %>
-      <% skill_missing = !StaffMember
-        .skilled_for(work_request_id: work_request.id)
-        .exists?(id: staff_member.id) %>
-      <% staffing_shortage = work_request.required_staff_count >
-        work_request.assignments.size %>
 
       <div class="col-12 col-md-4">
         <article
           class="card h-100 shadow-sm"
-          style="border-top: 0.25rem solid <%= skill_missing || staffing_shortage ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
+          style="border-top: 0.25rem solid var(--bs-primary);"
         >
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
@@ -36,17 +31,9 @@
                 <span class="badge text-bg-secondary">
                   <%= enum_label(staff_member, :employment_status) %>
                 </span>
-
-                <% if skill_missing || staffing_shortage %>
-                  <% if skill_missing %>
-                    <span class="badge text-bg-danger">スキル不足</span>
-                  <% end %>
-                  <% if staffing_shortage %>
-                    <span class="badge text-bg-danger">人数不足</span>
-                  <% end %>
-                <% else %>
-                  <span class="badge text-bg-primary">OK</span>
-                <% end %>
+                <span class="badge text-bg-primary">
+                  <%= enum_label(assignment, :status) %>
+                </span>
               </div>
 
               <small class="text-body-secondary">
@@ -81,15 +68,6 @@
                 <dd><%= work_request.required_skill.name %></dd>
               </div>
             </dl>
-
-            <% unless skill_missing || staffing_shortage %>
-              <div class="mt-3 pt-3 border-top">
-                <%= button_to "確定する",
-                  confirm_list_view_path(assignment),
-                  method: :patch,
-                  class: "btn btn-primary btn-sm w-100" %>
-              </div>
-            <% end %>
           </div>
         </article>
       </div>
@@ -97,6 +75,6 @@
   </div>
 <% else %>
   <div class="alert alert-info">
-    仮割り当てはありません。
+    確定済みの割り当てはありません。
   </div>
 <% end %>
