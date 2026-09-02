@@ -26,7 +26,7 @@
         .available_during(work_request_id: work_request.id)
         .exists?(id: staff_member.id) %>
 
-      <div class="col-12 col-md-6">
+      <div class="col-12 col-md-4">
         <article
           class="card h-100 shadow-sm"
           style="border-top: 0.25rem solid <%= skill_missing || unavailable ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
