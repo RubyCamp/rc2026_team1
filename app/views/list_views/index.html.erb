@@ -70,15 +70,15 @@
               </div>
 
               <div>
-                <dt>必要スキル</dt>
-                <dd><%= work_request.required_skill.name %></dd>
-              </div>
-
-              <div>
                 <dt>スタッフスキル</dt>
                 <dd>
                   <%= staff_member.skills.map(&:name).join("、").presence || "なし" %>
                 </dd>
+              </div>
+
+              <div>
+                <dt>必要スキル</dt>
+                <dd><%= work_request.required_skill.name %></dd>
               </div>
             </dl>
           </div>
