@@ -20,7 +20,7 @@
       <div class="col-12 col-md-6">
         <article class="card h-100 shadow-sm">
           <div class="card-body">
-            <span class="badge text-bg-secondary mb-3">
+            <span class="badge <%= staff_member.inactive? ? "text-bg-danger" : "text-bg-secondary" %> mb-3">
               <%= enum_label(
                     staff_member,
                     :employment_status
