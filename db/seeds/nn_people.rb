@@ -5,10 +5,10 @@ module NnPeopleSeed
     skills = {}
 
     [
-      [ "NN_CLEANING", "[NN]清掃" ],
-      [ "NN_SERVING", "[NN]配膳" ],
-      [ "NN_RECEPTION", "[NN]受付" ],
-      [ "NN_KITCHEN", "[NN]調理補助" ]
+      [ "NN_CLEANING", "清掃" ],
+      [ "NN_SERVING", "配膳" ],
+      [ "NN_RECEPTION", "受付" ],
+      [ "NN_KITCHEN", "調理補助" ]
     ].each do |code, name|
       skills[code] = NnSeed.upsert_by(
         Skill,
@@ -19,18 +19,18 @@ module NnPeopleSeed
     end
 
     profiles = [
-      [ "NN001", "[NN]佐々木 あおい", :active, [ [ "NN_CLEANING", "経験あり" ] ] ],
-      [ "NN002", "[NN]田中 れん", :active, [ [ "NN_SERVING", "熟練" ] ] ],
-      [ "NN003", "[NN]山本 みどり", :active, [ [ "NN_RECEPTION", "経験あり" ] ] ],
-      [ "NN004", "[NN]伊藤 たくみ", :active, [ [ "NN_KITCHEN", "研修中" ] ] ],
-      [ "NN005", "[NN]渡辺 なお", :active, [ [ "NN_CLEANING", "熟練" ], [ "NN_SERVING", "経験あり" ] ] ],
-      [ "NN006", "[NN]中村 ひかり", :active, [ [ "NN_SERVING", "経験あり" ], [ "NN_RECEPTION", "研修中" ] ] ],
-      [ "NN007", "[NN]小林 そうた", :active, [ [ "NN_CLEANING", "研修中" ], [ "NN_RECEPTION", "経験あり" ] ] ],
-      [ "NN008", "[NN]加藤 ゆう", :active, [ [ "NN_KITCHEN", "経験あり" ], [ "NN_CLEANING", "経験あり" ] ] ],
-      [ "NN009", "[NN]吉田 まい", :active, [ [ "NN_CLEANING", "未経験" ] ] ],
-      [ "NN010", "[NN]山田 けい", :active, [ [ "NN_CLEANING", "経験あり" ], [ "NN_SERVING", "研修中" ] ] ],
-      [ "NN011", "[NN]井上 りく", :active, [ [ "NN_RECEPTION", "熟練" ], [ "NN_KITCHEN", "経験あり" ] ] ],
-      [ "NN012", "[NN]木村 こうじ", :inactive, [ [ "NN_CLEANING", "熟練" ] ] ]
+      [ "NN001", "佐々木 あおい", :active, [ [ "NN_CLEANING", "経験あり" ] ] ],
+      [ "NN002", "田中 れん", :active, [ [ "NN_SERVING", "熟練" ] ] ],
+      [ "NN003", "山本 みどり", :active, [ [ "NN_RECEPTION", "経験あり" ] ] ],
+      [ "NN004", "伊藤 たくみ", :active, [ [ "NN_KITCHEN", "研修中" ] ] ],
+      [ "NN005", "渡辺 なお", :active, [ [ "NN_CLEANING", "熟練" ], [ "NN_SERVING", "経験あり" ] ] ],
+      [ "NN006", "中村 ひかり", :active, [ [ "NN_SERVING", "経験あり" ], [ "NN_RECEPTION", "研修中" ] ] ],
+      [ "NN007", "小林 そうた", :active, [ [ "NN_CLEANING", "研修中" ], [ "NN_RECEPTION", "経験あり" ] ] ],
+      [ "NN008", "加藤 ゆう", :active, [ [ "NN_KITCHEN", "経験あり" ], [ "NN_CLEANING", "経験あり" ] ] ],
+      [ "NN009", "吉田 まい", :active, [ [ "NN_CLEANING", "未経験" ] ] ],
+      [ "NN010", "山田 けい", :active, [ [ "NN_CLEANING", "経験あり" ], [ "NN_SERVING", "研修中" ] ] ],
+      [ "NN011", "井上 りく", :active, [ [ "NN_RECEPTION", "熟練" ], [ "NN_KITCHEN", "経験あり" ] ] ],
+      [ "NN012", "木村 こうじ", :inactive, [ [ "NN_CLEANING", "熟練" ] ] ]
     ]
 
     staff_members = {}

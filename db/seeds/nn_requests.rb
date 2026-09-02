@@ -7,9 +7,9 @@ module NnRequestsSeed
 
     businesses = {}
     [
-      [ :hotel, "[NN]みらいホテル", "NN担当者01", "03-0000-0101" ],
-      [ :hall, "[NN]あおぞら会館", "NN担当者02", "03-0000-0102" ],
-      [ :office, "[NN]中央オフィス", "NN担当者03", "03-0000-0103" ]
+      [ :hotel, "みらいホテル", "担当者01", "03-0000-0101" ],
+      [ :hall, "あおぞら会館", "担当者02", "03-0000-0102" ],
+      [ :office, "中央オフィス", "担当者03", "03-0000-0103" ]
     ].each do |key, name, contact_name, contact_phone|
       businesses[key] = NnSeed.upsert_by(
         Business,
@@ -21,18 +21,18 @@ module NnRequestsSeed
     end
 
     request_specs = [
-      [ :hotel, "NN客室清掃01", "NN_CLEANING", 20, 10, 12, 1, :open ],
-      [ :hotel, "NN宴会場清掃01", "NN_CLEANING", 20, 13, 17, 3, :open ],
-      [ :hall, "NN受付案内01", "NN_RECEPTION", 20, 10, 12, 2, :open ],
-      [ :hall, "NN式典配膳01", "NN_SERVING", 20, 14, 18, 2, :confirmed ],
-      [ :office, "NN調理補助01", "NN_KITCHEN", 20, 18, 20, 1, :open ],
-      [ :hotel, "NN朝食配膳01", "NN_SERVING", 21, 7, 10, 2, :confirmed ],
-      [ :hall, "NN会館受付01", "NN_RECEPTION", 21, 10, 14, 2, :draft ],
-      [ :office, "NN厨房準備01", "NN_KITCHEN", 21, 13, 17, 2, :open ],
-      [ :hotel, "NN共用部清掃01", "NN_CLEANING", 22, 9, 12, 2, :open ],
-      [ :hall, "NN来場者受付01", "NN_RECEPTION", 22, 13, 16, 1, :open ],
-      [ :office, "NN弁当準備01", "NN_KITCHEN", 22, 16, 20, 3, :open ],
-      [ :hotel, "NN取消清掃01", "NN_CLEANING", 22, 10, 12, 1, :cancelled ]
+      [ :hotel, "客室清掃01", "NN_CLEANING", 20, 10, 12, 1, :open ],
+      [ :hotel, "宴会場清掃01", "NN_CLEANING", 20, 13, 17, 3, :open ],
+      [ :hall, "受付案内01", "NN_RECEPTION", 20, 10, 12, 2, :open ],
+      [ :hall, "式典配膳01", "NN_SERVING", 20, 14, 18, 2, :confirmed ],
+      [ :office, "調理補助01", "NN_KITCHEN", 20, 18, 20, 1, :open ],
+      [ :hotel, "朝食配膳01", "NN_SERVING", 21, 7, 10, 2, :confirmed ],
+      [ :hall, "会館受付01", "NN_RECEPTION", 21, 10, 14, 2, :draft ],
+      [ :office, "厨房準備01", "NN_KITCHEN", 21, 13, 17, 2, :open ],
+      [ :hotel, "共用部清掃01", "NN_CLEANING", 22, 9, 12, 2, :open ],
+      [ :hall, "来場者受付01", "NN_RECEPTION", 22, 13, 16, 1, :open ],
+      [ :office, "弁当準備01", "NN_KITCHEN", 22, 16, 20, 3, :open ],
+      [ :hotel, "取消清掃01", "NN_CLEANING", 22, 10, 12, 1, :cancelled ]
     ]
 
     18.times do |index|
@@ -46,7 +46,7 @@ module NnRequestsSeed
 
       request_specs << [
         business_key,
-        format("NN定期業務%02d", index + 1),
+        format("定期業務%02d", index + 1),
         skill_code,
         day,
         start_hour,
@@ -71,15 +71,15 @@ module NnRequestsSeed
     end
 
     assignment_specs = {
-      "NN客室清掃01" => [ [ "NN001", :draft ] ],
-      "NN宴会場清掃01" => [ [ "NN001", :draft ], [ "NN005", :draft ] ],
-      "NN式典配膳01" => [ [ "NN002", :confirmed ], [ "NN006", :confirmed ] ],
-      "NN朝食配膳01" => [ [ "NN005", :confirmed ] ],
-      "NN会館受付01" => [ [ "NN003", :draft ] ],
-      "NN厨房準備01" => [ [ "NN004", :draft ] ],
-      "NN共用部清掃01" => [ [ "NN007", :draft ], [ "NN008", :draft ] ],
-      "NN来場者受付01" => [ [ "NN011", :draft ] ],
-      "NN弁当準備01" => [ [ "NN004", :draft ], [ "NN008", :draft ] ]
+      "客室清掃01" => [ [ "NN001", :draft ] ],
+      "宴会場清掃01" => [ [ "NN001", :draft ], [ "NN005", :draft ] ],
+      "式典配膳01" => [ [ "NN002", :confirmed ], [ "NN006", :confirmed ] ],
+      "朝食配膳01" => [ [ "NN005", :confirmed ] ],
+      "会館受付01" => [ [ "NN003", :draft ] ],
+      "厨房準備01" => [ [ "NN004", :draft ] ],
+      "共用部清掃01" => [ [ "NN007", :draft ], [ "NN008", :draft ] ],
+      "来場者受付01" => [ [ "NN011", :draft ] ],
+      "弁当準備01" => [ [ "NN004", :draft ], [ "NN008", :draft ] ]
     }
 
     assignment_specs.each do |title, assignments|
