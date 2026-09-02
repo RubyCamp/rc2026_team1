@@ -78,6 +78,17 @@
                       "指定なし" %>
                 </dd>
               </div>
+
+              <div>
+                <dt>スタッフスキル</dt>
+                <dd>
+                  <% work_request.staff_members.each do |staff_member| %>
+                        <%= staff_member.skills.map(&:name)
+                        .join("、")
+                        .presence || "なし" %>
+                        <% end %>
+                </dd>
+              </div>
             </dl>
             <%#= button_to "確定済み", {} %>
           </div>
