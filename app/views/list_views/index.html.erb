@@ -22,20 +22,32 @@
       <% skill_missing = !StaffMember
         .skilled_for(work_request_id: work_request.id)
         .exists?(id: staff_member.id) %>
-      <% unavailable = !StaffMember
-        .available_during(work_request_id: work_request.id)
-        .exists?(id: staff_member.id) %>
+      <% staffing_shortage = work_request.required_staff_count >
+        work_request.assignments.size %>
 
       <div class="col-12 col-md-4">
         <article
           class="card h-100 shadow-sm"
-          style="border-top: 0.25rem solid <%= skill_missing || unavailable ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
+          style="border-top: 0.25rem solid <%= skill_missing || staffing_shortage ? 'var(--bs-danger)' : 'var(--bs-primary)' %>;"
         >
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
-              <span class="badge text-bg-secondary">
-                <%= enum_label(staff_member, :employment_status) %>
-              </span>
+              <div class="d-flex gap-2">
+                <span class="badge text-bg-secondary">
+                  <%= enum_label(staff_member, :employment_status) %>
+                </span>
+
+                <% if skill_missing || staffing_shortage %>
+                  <% if skill_missing %>
+                    <span class="badge text-bg-danger">スキル不足</span>
+                  <% end %>
+                  <% if staffing_shortage %>
+                    <span class="badge text-bg-danger">人数不足</span>
+                  <% end %>
+                <% else %>
+                  <span class="badge text-bg-primary">OK</span>
+                <% end %>
+              </div>
 
               <small class="text-body-secondary">
                 <%= l work_request.starts_at, format: :short %>
@@ -69,16 +81,6 @@
                 </dd>
               </div>
             </dl>
-
-            <% warnings = [] %>
-            <% warnings << "勤務不可能" if unavailable %>
-            <% warnings << "スキル不足" if skill_missing %>
-
-            <% if warnings.any? %>
-              <div class="text-danger">
-                <%= warnings.join("、") %>
-              </div>
-            <% end %>
           </div>
         </article>
       </div>
