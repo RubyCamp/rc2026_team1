@@ -89,6 +89,14 @@
                         <% end %>
                 </dd>
               </div>
+              <% a = [] %>
+              <% a << "人手不足" if work_request.required_staff_count != work_request.assignments.size %>
+              <% a << "勤務不可能" unless work_request.staff_members.available_during(work_request_id: work_request.id).any? %>
+              <% a << "スキル不足" unless work_request.skills.map(&:id).include?(work_request.required_skill_id) %>
+              <div class="text-danger">
+                <%= a.join("、") %>
+              </div>
+
             </dl>
             <%#= button_to "確定済み", {} %>
           </div>
