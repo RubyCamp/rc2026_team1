@@ -2,7 +2,7 @@ class ListViewsController < ApplicationController
   def index
     @work_requests = WorkRequest
     .includes(:business, :required_skill, :assignments, assignments: :staff_member)
-    .where(assignments: { status: "draft" }) # Assignmentのstatusがdraftのものだけ残す
+    .where.not(id: Assignment.where(status: "confirmed").select(:work_request_id)) # confirmedがついていないもの
     .order(:starts_at)
   end
 end
