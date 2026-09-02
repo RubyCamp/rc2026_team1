@@ -3,7 +3,7 @@ class ListViewsController < ApplicationController
     @work_requests = WorkRequest
     .includes(:business, :required_skill, :assignments, assignments: :staff_member)
     # .where.not(id: Assignment.where(status: "confirmed").select(:work_request_id)) # confirmedがついていないもの
-    .where(assignments: { status: "draft" }) #draftがついているもの
+    .where(assignments: { status: "draft" }) # draftがついているもの
     .order(:starts_at)
 
     @staff_members = StaffMember
