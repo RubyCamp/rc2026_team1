@@ -6,6 +6,7 @@ class WorkRequest < ApplicationRecord
 
   has_many :assignments, dependent: :destroy
   has_many :staff_members, through: :assignments
+  has_many :skils, through: :staff_members
 
   enum :status,
        {
