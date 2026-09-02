@@ -58,7 +58,7 @@
                 <dd><%= work_request.business.name %></dd>
               </div>
 
-              <div style="<%= 'background-color: #ff6d7c;' if work_request.required_staff_count > work_request.assignments.size %>">
+              <div>
                 <dt>必要人数</dt>
                 <dd>
                   <%= work_request.required_staff_count %>名
@@ -72,24 +72,30 @@
                 </dd>
               </div>
 
-              <div>
-                <dt>必要スキル</dt>
-                <dd>
-                  <%= work_request.required_skill&.name ||
-                      "指定なし" %>
-                </dd>
-              </div>
+                 <% work_request.staff_members.each do |staff_member| %>
+  <div>
+    <dt>必要スキル</dt>
+    <dd>
+      <%= work_request.required_skill&.name || "指定なし" %>
+    </dd>
+  </div>
 
-              <div>
-                <dt>スタッフスキル</dt>
-                <dd>
-                  <% work_request.staff_members.each do |staff_member| %>
-                        <%= staff_member.skills.map(&:name)
-                        .join("、")
-                        .presence || "なし" %>
-                        <% end %>
-                </dd>
-              </div>
+  <div
+    style="<%= 'background-color: #ff6d7c;' if
+      work_request.required_skill&.name.present? &&
+      !staff_member.skills.map(&:name).include?(work_request.required_skill.name)
+    %>"
+  >
+    <dt>スタッフスキル</dt>
+    <dd>
+      <%= staff_member.skills
+            .map(&:name)
+            .join("、")
+            .presence || "指定なし" %>
+    </dd>
+  </div>
+<% end %>
+
             </dl>
             <%#= button_to "確定済み", {} %>
           </div>
