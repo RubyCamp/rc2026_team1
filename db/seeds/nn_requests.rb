@@ -32,7 +32,8 @@ module NnRequestsSeed
       [ :hotel, "共用部清掃01", "NN_CLEANING", 22, 9, 12, 2, :open ],
       [ :hall, "来場者受付01", "NN_RECEPTION", 22, 13, 16, 1, :open ],
       [ :office, "弁当準備01", "NN_KITCHEN", 22, 16, 20, 3, :open ],
-      [ :hotel, "取消清掃01", "NN_CLEANING", 22, 10, 12, 1, :cancelled ]
+      [ :hotel, "取消清掃01", "NN_CLEANING", 22, 10, 12, 1, :cancelled ],
+      [ :office, "スキル確認01", "NN_RECEPTION", 22, 10, 12, 1, :open ]
     ]
 
     18.times do |index|
@@ -79,7 +80,8 @@ module NnRequestsSeed
       "厨房準備01" => [ [ "NN004", :draft ] ],
       "共用部清掃01" => [ [ "NN007", :draft ], [ "NN008", :draft ] ],
       "来場者受付01" => [ [ "NN011", :draft ] ],
-      "弁当準備01" => [ [ "NN004", :draft ], [ "NN008", :draft ] ]
+      "弁当準備01" => [ [ "NN004", :draft ], [ "NN008", :draft ] ],
+      "スキル確認01" => [ [ "NN001", :draft ] ]
     }
 
     assignment_specs.each do |title, assignments|
