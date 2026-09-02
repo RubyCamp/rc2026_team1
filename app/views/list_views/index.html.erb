@@ -13,6 +13,9 @@
   </p>
 </div>
 
+<div class="container">
+  <div class="row align-items-start">
+    <div class="col">
 <% if @work_requests.any? %>
   <div class="row g-4">
     <% @work_requests.each do |work_request| %>
@@ -76,6 +79,62 @@
                 </dd>
               </div>
             </dl>
+            <%#= button_to "確定済み", {} %>
+          </div>
+        </article>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+      <div class="alert alert-info">
+        勤務依頼はまだ登録されていません。
+      </div>
+<% end %>
+    </div>
+    <div class="col">
+      <% if @staff_members.any? %>
+  <div class="row g-4">
+    <% @staff_members.each do |staff_member| %>
+      <div class="col-12 col-md-6">
+        <article class="card h-100 shadow-sm">
+          <div class="card-body">
+            <span class="badge text-bg-secondary mb-3">
+              <%= enum_label(
+                    staff_member,
+                    :employment_status
+                  ) %>
+            </span>
+
+            <h2 class="h5 card-title">
+              <%= staff_member.name %>
+            </h2>
+
+            <dl class="definition-list mb-0">
+              <div>
+                <dt>スキル</dt>
+                <dd>
+                  <%= staff_member.skills
+                        .map(&:name)
+                        .join("、")
+                        .presence || "なし" %>
+                </dd>
+              </div>
+
+              <div>
+                <dt>勤務予定</dt>
+                <dd>
+                  <%= staff_member.availabilities
+                        .map do |availability|
+                          enum_label(
+                            availability,
+                            :status
+                          )
+                        end
+                        .join("、")
+                        .presence || "未登録" %>
+                </dd>
+              </div>
+            </dl>
           </div>
         </article>
       </div>
@@ -83,6 +142,9 @@
   </div>
 <% else %>
   <div class="alert alert-info">
-    勤務依頼はまだ登録されていません。
+    スタッフはまだ登録されていません。
   </div>
 <% end %>
+    </div>
+  </div>
+</div>
