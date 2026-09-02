@@ -9,7 +9,7 @@ class StaffMember < ApplicationRecord
   validates :name, presence: true
 
   def self.for_list
-    includes(:skills, :availabilities).order(:name)
+    includes(:skills, :availabilities).active.order(:name)
   end
 
   def self.for_assignment
