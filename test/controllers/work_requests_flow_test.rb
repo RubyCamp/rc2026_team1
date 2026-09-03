@@ -124,6 +124,43 @@ class WorkRequestsFlowTest < ActionDispatch::IntegrationTest
     assert_redirected_to work_request_path(@work_request)
   end
 
+  test "必要人数分のスタッフ確定後に勤務依頼の受付を終了する" do
+    staff_member = StaffMember.create!(
+      name: "受付終了対象スタッフ",
+      employment_status: :active
+    )
+    StaffSkill.create!(
+      staff_member: staff_member,
+      skill: @required_skill,
+      proficiency_label: "経験あり"
+    )
+    assignment = Assignment.assign!(
+      work_request_id: @work_request.id,
+      staff_member_id: staff_member.id
+    )
+
+    @work_request.open!
+    get work_request_path(@work_request)
+    assert_select "button", text: "受付を終了する", count: 0
+
+    Assignment.confirm!(id: assignment.id)
+    get work_request_path(@work_request)
+    assert_select "form[action=?]", confirm_work_request_path(@work_request) do
+      assert_select "button", text: "受付を終了する"
+    end
+
+    assert_difference("ChangeEvent.count", 1) do
+      patch confirm_work_request_path(@work_request)
+    end
+
+    assert_predicate @work_request.reload, :confirmed?
+    assert_redirected_to work_request_path(@work_request)
+
+    follow_redirect!
+    assert_select ".badge", text: "確定"
+    assert_select "button", text: "受付を終了する", count: 0
+  end
+
   test "備考だけを更新して詳細画面へ戻る" do
     assert_difference("ChangeEvent.count", 1) do
       patch work_request_path(@work_request), params: {
