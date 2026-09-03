@@ -98,5 +98,16 @@
 
       <%= yield %>
     </main>
+    <button
+      type="button"
+      class="btn btn-primary back-to-top"
+      data-controller="back-to-top"
+      data-back-to-top-threshold-value="300"
+      data-action="click->back-to-top#scrollToTop"
+      aria-label="ページ上部へ戻る"
+    >
+      ↑
+    </button>
+
   </body>
 </html>
