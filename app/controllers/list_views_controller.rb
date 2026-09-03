@@ -1,6 +1,13 @@
 class ListViewsController < ApplicationController
   def index
-    @assignments = Assignment.draft_for_confirmation
+    @businesses = Business.for_selection
+    assignments = Assignment.draft_for_confirmation
+    assignments = assignments.where(
+      work_requests: { business_id: params[:business_id] }
+    ) if params[:business_id].present?
+    assignments = filter_assignments_by_date(assignments)
+
+    @assignments = assignments.select { |assignment| judgment_match?(assignment) }
   end
 
   def confirmed
@@ -55,7 +62,48 @@ class ListViewsController < ApplicationController
     redirect_back fallback_location: confirmed_list_views_path,
       alert: "未確定に戻す割り当てが見つかりませんでした。"
   end
+
   private
+
+  def filter_assignments_by_date(assignments)
+    date_range = case params[:date_filter]
+    when "today"
+      Time.zone.today.all_day
+    when "week"
+      Time.zone.today.all_week
+    when "date"
+      return assignments if params[:work_date].blank?
+
+      Date.iso8601(params[:work_date]).all_day
+    end
+
+    return assignments unless date_range
+
+    assignments.where(work_requests: { starts_at: date_range })
+  rescue ArgumentError
+    assignments
+  end
+
+  def judgment_match?(assignment)
+    work_request = assignment.work_request
+    skill_missing = !StaffMember
+      .skilled_for(work_request_id: work_request.id)
+      .exists?(id: assignment.staff_member_id)
+    staffing_shortage = !work_request.staffing_sufficient?
+
+    case params[:judgment]
+    when "attention"
+      skill_missing || staffing_shortage
+    when "ok"
+      !skill_missing && !staffing_shortage
+    when "skill_missing"
+      skill_missing
+    when "staffing_shortage"
+      staffing_shortage
+    else
+      true
+    end
+  end
 
   def modal_toggle_request?
     params[:modal_toggle] == "true" && request.format.turbo_stream?
