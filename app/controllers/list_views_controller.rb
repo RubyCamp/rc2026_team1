@@ -22,16 +22,18 @@ class ListViewsController < ApplicationController
       .exists?(id: staff_member.id)
 
     if !assignment.draft? || skill_missing || !work_request.staffing_sufficient?
-      redirect_to list_views_path,
+      return render_assignment_status(assignment) if request.format.turbo_stream?
+      redirect_back fallback_location: list_views_path,
         alert: "問題のない仮割り当てだけ確定できます。"
       return
     end
 
     Assignment.confirm!(id: assignment.id)
-    redirect_to list_views_path,
+    return render_assignment_status(assignment) if request.format.turbo_stream?
+    redirect_back fallback_location: list_views_path,
       notice: "#{staff_member.name}さんの仮割り当てを確定しました。"
   rescue ActiveRecord::RecordNotFound
-    redirect_to list_views_path,
+    redirect_back fallback_location: list_views_path,
       alert: "確定する仮割り当てが見つかりませんでした。"
   end
 
@@ -39,16 +41,27 @@ class ListViewsController < ApplicationController
     assignment = Assignment.find(params[:id])
 
     unless assignment.confirmed?
-      redirect_to confirmed_list_views_path,
+      return render_assignment_status(assignment) if request.format.turbo_stream?
+      redirect_back fallback_location: confirmed_list_views_path,
         alert: "確定済みの割り当てだけ未確定に戻せます。"
       return
     end
 
     assignment.draft!
-    redirect_to confirmed_list_views_path,
+    return render_assignment_status(assignment) if request.format.turbo_stream?
+    redirect_back fallback_location: confirmed_list_views_path,
       notice: "#{assignment.staff_member.name}さんの割り当てを未確定に戻しました。"
   rescue ActiveRecord::RecordNotFound
-    redirect_to confirmed_list_views_path,
+    redirect_back fallback_location: confirmed_list_views_path,
       alert: "未確定に戻す割り当てが見つかりませんでした。"
+  end
+  private
+
+  def render_assignment_status(assignment)
+    render turbo_stream: turbo_stream.replace(
+      "assignment-status-#{assignment.id}",
+      partial: "shared/assignment_status_button",
+      locals: { assignment: assignment }
+    )
   end
 end

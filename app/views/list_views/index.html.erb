@@ -55,7 +55,12 @@
             </div>
 
             <h2 class="h5 card-title">
-              <%= staff_member.name %>
+              <button type="button"
+                      class="shift-modal-trigger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#shiftModal-<%= assignment.id %>">
+                <%= staff_member.name %>
+              </button>
             </h2>
 
             <dl class="definition-list mb-0">
@@ -92,6 +97,10 @@
             <% end %>
           </div>
         </article>
+
+        <%= render "shared/shift_modal",
+          staff_member: staff_member,
+          modal_id: "shiftModal-#{assignment.id}" %>
       </div>
     <% end %>
   </div>
