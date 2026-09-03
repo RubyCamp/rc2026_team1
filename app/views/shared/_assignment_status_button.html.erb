@@ -3,12 +3,14 @@
     <%= button_to "仮割り当て",
       confirm_list_view_path(assignment),
       method: :patch,
+      params: { modal_toggle: true },
       class: "badge border-0 text-bg-warning me-2",
       form: { class: "d-inline", data: { turbo_stream: true } } %>
   <% else %>
     <%= button_to "確定済み",
       unconfirm_list_view_path(assignment),
       method: :patch,
+      params: { modal_toggle: true },
       class: "badge border-0 text-bg-primary me-2",
       form: { class: "d-inline", data: { turbo_stream: true } } %>
   <% end %>
