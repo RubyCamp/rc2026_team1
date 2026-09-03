@@ -18,6 +18,7 @@ Rails.application.routes.draw do
 
   resources :work_requests, only: %i[index show edit update] do
     post :assign, on: :member
+    delete :unassign, on: :member
   end
   resources :staff_members, only: [ :index ]
   resources :list_views, only: [ :index ] do
