@@ -53,6 +53,10 @@ class WorkRequest < ApplicationRecord
     staffing_shortage_count.zero?
   end
 
+  def confirmable?
+    open? && assignments.confirmed.count >= required_staff_count
+  end
+
   def self.register!(attributes:)
   transaction do
     create!(attributes).tap do |work_request|
@@ -96,6 +100,26 @@ def self.cancel!(id:)
         target_id: work_request.id,
         action_type: :cancelled,
         summary: "勤務依頼「#{work_request.title}」を取り消しました"
+      )
+    end
+  end
+end
+
+def self.confirm!(id:)
+  transaction do
+    find(id).tap do |work_request|
+      unless work_request.confirmable?
+        work_request.errors.add(:base, "必要人数分のスタッフ確定が必要です")
+        raise ActiveRecord::RecordInvalid, work_request
+      end
+
+      work_request.confirmed!
+
+      ChangeEvent.record!(
+        target_type: :work_request,
+        target_id: work_request.id,
+        action_type: :confirmed,
+        summary: "勤務依頼「#{work_request.title}」の受付を終了しました"
       )
     end
   end

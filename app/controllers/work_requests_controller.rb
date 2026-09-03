@@ -61,6 +61,18 @@ class WorkRequestsController < ApplicationController
       alert: error.record.errors.full_messages.to_sentence
   end
 
+  def confirm
+    work_request = WorkRequest.confirm!(id: params[:id])
+    redirect_to work_request,
+      notice: "受付を終了し、勤務依頼を確定しました。"
+  rescue ActiveRecord::RecordInvalid => error
+    redirect_to work_request_path(params[:id]),
+      alert: error.record.errors.full_messages.to_sentence
+  rescue ActiveRecord::RecordNotFound
+    redirect_to work_requests_path,
+      alert: "確定する勤務依頼が見つかりませんでした。"
+  end
+
   def update
     @work_request = WorkRequest.update_details!(
       id: params[:id],

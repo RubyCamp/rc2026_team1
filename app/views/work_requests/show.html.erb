@@ -35,9 +35,18 @@
     </p>
   </div>
 
-  <span class="badge text-bg-primary">
-    <%= enum_label(@work_request, :status) %>
-  </span>
+  <div class="d-flex align-items-center gap-2">
+    <span class="badge text-bg-primary">
+      <%= enum_label(@work_request, :status) %>
+    </span>
+
+    <% if @work_request.confirmable? %>
+      <%= button_to "受付を終了する",
+        confirm_work_request_path(@work_request),
+        method: :patch,
+        class: "btn btn-primary btn-sm" %>
+    <% end %>
+  </div>
 </div>
 
 <section class="card shadow-sm mb-4">
