@@ -9,10 +9,32 @@ class WorkRequestsController < ApplicationController
     @work_request = WorkRequest
       .includes(:business, :required_skill, assignments: :staff_member)
       .find(params[:id])
+    @assignable_staff_members = StaffMember.for_assignment.includes(:skills).where.not(
+      id: Assignment.where(work_request: @work_request).select(:staff_member_id)
+    )
   end
 
   def edit
     @work_request = WorkRequest.find(params[:id])
+  end
+
+  def assign
+    assignment = Assignment.assign!(
+      work_request_id: params[:id],
+      staff_member_id: params.expect(:staff_member_id)
+    )
+
+    redirect_to assignment.work_request,
+      notice: "#{assignment.staff_member.name}さんを仮割り当てしました。"
+  rescue ActionController::ParameterMissing
+    redirect_to work_request_path(params[:id]),
+      alert: "スタッフを選択してください。"
+  rescue ActiveRecord::RecordInvalid => error
+    redirect_to work_request_path(params[:id]),
+      alert: error.record.errors.full_messages.to_sentence
+  rescue ActiveRecord::RecordNotFound
+    redirect_to work_requests_path,
+      alert: "割り当てる勤務依頼が見つかりませんでした。"
   end
 
   def update

@@ -44,6 +44,23 @@ class Assignment < ApplicationRecord
     overlapping_for(id: id).exists?
   end
 
+  def self.time_conflict_for?(work_request_id:, staff_member_id:)
+    work_request = WorkRequest.find(work_request_id)
+    return false if work_request.cancelled?
+
+    joins(:work_request)
+      .where(staff_member_id: staff_member_id)
+      .where.not(work_request_id: work_request_id)
+      .where.not(work_requests: { status: :cancelled })
+      .where(
+        "work_requests.starts_at < :target_ends_at " \
+        "AND work_requests.ends_at > :target_starts_at",
+        target_ends_at: work_request.ends_at,
+        target_starts_at: work_request.starts_at
+      )
+      .exists?
+  end
+
   def self.assign!(work_request_id:, staff_member_id:)
   transaction do
     create!(

@@ -16,7 +16,9 @@ Rails.application.routes.draw do
     # root "posts#index"
     root "work_requests#index"
 
-  resources :work_requests, only: %i[index show edit update]
+  resources :work_requests, only: %i[index show edit update] do
+    post :assign, on: :member
+  end
   resources :staff_members, only: [ :index ]
   resources :list_views, only: [ :index ] do
     get :confirmed, on: :collection

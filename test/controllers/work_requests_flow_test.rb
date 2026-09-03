@@ -7,10 +7,10 @@ class WorkRequestsFlowTest < ActionDispatch::IntegrationTest
       contact_name: "担当者",
       contact_phone: "00-0000-0000"
     )
-    skill = Skill.create!(code: "RECEPTION_#{SecureRandom.hex(4)}", name: "受付")
+    @required_skill = Skill.create!(code: "RECEPTION_#{SecureRandom.hex(4)}", name: "受付")
     @work_request = WorkRequest.create!(
       business: @business,
-      required_skill: skill,
+      required_skill: @required_skill,
       title: "受付業務",
       starts_at: Time.zone.local(2026, 8, 20, 10),
       ends_at: Time.zone.local(2026, 8, 20, 12),
@@ -24,8 +24,66 @@ class WorkRequestsFlowTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", text: "備考"
+    assert_select "dt", text: "勤務時間"
     assert_select "p", text: "集合場所は正面玄関"
     assert_select "a[href=?]", edit_work_request_path(@work_request), text: "備考を編集"
+  end
+
+  test "スキル不足と時間重複があっても仮割り当てして警告を表示する" do
+    other_skill = Skill.create!(code: "OTHER_#{SecureRandom.hex(4)}", name: "清掃")
+    staff_member = StaffMember.create!(
+      name: "警告対象スタッフ",
+      employment_status: :active
+    )
+    StaffSkill.create!(
+      staff_member: staff_member,
+      skill: other_skill,
+      proficiency_label: "経験あり"
+    )
+
+    overlapping_request = WorkRequest.create!(
+      business: @business,
+      required_skill: other_skill,
+      title: "重複する勤務依頼",
+      starts_at: Time.zone.local(2026, 8, 20, 11),
+      ends_at: Time.zone.local(2026, 8, 20, 13),
+      required_staff_count: 1,
+      status: :open
+    )
+    Assignment.assign!(
+      work_request_id: overlapping_request.id,
+      staff_member_id: staff_member.id
+    )
+
+    get work_request_path(@work_request)
+    assert_response :success
+    assert_select ".dropdown-menu" do
+      assert_select "button.dropdown-item", text: /警告対象スタッフ.*清掃/
+      assert_select ".badge.text-bg-danger", text: "スキル不足"
+      assert_select ".badge.text-bg-danger", text: "時間重複"
+      assert_select "input[name=staff_member_id][value=?]", staff_member.id.to_s
+    end
+
+    assert_difference("Assignment.count", 1) do
+      post assign_work_request_path(@work_request), params: {
+        staff_member_id: staff_member.id
+      }
+    end
+
+    assignment = Assignment.find_by!(
+      work_request: @work_request,
+      staff_member: staff_member
+    )
+    assert assignment.draft?
+    assert_redirected_to work_request_path(@work_request)
+
+    follow_redirect!
+    assert_response :success
+    assert_select "li.list-group-item-danger" do
+      assert_select "strong", text: staff_member.name
+      assert_select ".badge.text-bg-danger", text: "スキル不足"
+      assert_select ".badge.text-bg-danger", text: "時間重複"
+    end
   end
 
   test "備考だけを更新して詳細画面へ戻る" do
