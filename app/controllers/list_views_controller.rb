@@ -22,14 +22,14 @@ class ListViewsController < ApplicationController
       .exists?(id: staff_member.id)
 
     if !assignment.draft? || skill_missing || !work_request.staffing_sufficient?
-      return render_assignment_status(assignment) if request.format.turbo_stream?
+      return render_assignment_status(assignment) if modal_toggle_request?
       redirect_back fallback_location: list_views_path,
         alert: "問題のない仮割り当てだけ確定できます。"
       return
     end
 
     Assignment.confirm!(id: assignment.id)
-    return render_assignment_status(assignment) if request.format.turbo_stream?
+    return render_assignment_status(assignment) if modal_toggle_request?
     redirect_back fallback_location: list_views_path,
       notice: "#{staff_member.name}さんの仮割り当てを確定しました。"
   rescue ActiveRecord::RecordNotFound
@@ -41,14 +41,14 @@ class ListViewsController < ApplicationController
     assignment = Assignment.find(params[:id])
 
     unless assignment.confirmed?
-      return render_assignment_status(assignment) if request.format.turbo_stream?
+      return render_assignment_status(assignment) if modal_toggle_request?
       redirect_back fallback_location: confirmed_list_views_path,
         alert: "確定済みの割り当てだけ未確定に戻せます。"
       return
     end
 
     assignment.draft!
-    return render_assignment_status(assignment) if request.format.turbo_stream?
+    return render_assignment_status(assignment) if modal_toggle_request?
     redirect_back fallback_location: confirmed_list_views_path,
       notice: "#{assignment.staff_member.name}さんの割り当てを未確定に戻しました。"
   rescue ActiveRecord::RecordNotFound
@@ -56,6 +56,10 @@ class ListViewsController < ApplicationController
       alert: "未確定に戻す割り当てが見つかりませんでした。"
   end
   private
+
+  def modal_toggle_request?
+    params[:modal_toggle] == "true" && request.format.turbo_stream?
+  end
 
   def render_assignment_status(assignment)
     render turbo_stream: turbo_stream.replace(
