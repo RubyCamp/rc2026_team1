@@ -67,59 +67,9 @@
             </div>
           </div>
         </article>
-        <div class="modal fade" id="shiftModal-<%= staff_member.id %>" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title"><%= staff_member.name %> さんのシフト
-                </h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <% if staff_member.availabilities.any? || staff_member.assignments.any? %>
-                  <div class="list-group">
-                    <% Availability.for_staff(staff_member_id: staff_member.id).each do |availability| %>
-                      <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                          <span class="badge text-bg-secondary me-2">
-                            <%= enum_label(availability, :status) %>
-                          </span>
-                          <strong><%= availability.starts_at.strftime("%Y/%m/%d") %></strong>
-                        </div>
-                        <span class="text-body-secondary small">
-                          <%= availability.starts_at.strftime("%H:%M") %> ~ <%= availability.ends_at.strftime("%H:%M") %>
-                        </span>
-                      </div>
-                    <% end %>
-                    <% staff_member.assignments.sort_by { |assignment| assignment.work_request.starts_at }.each do |assignment| %>
-                      <% work_request = assignment.work_request %>
-                      <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                          <span class="badge <%= assignment.draft? ? 'text-bg-warning' : 'text-bg-primary' %> me-2">
-                            <%= assignment.draft? ? "仮割り当て" : "確定済み" %>
-                          </span>
-                          <strong><%= work_request.title %></strong>
-                        </div>
-                        <span class="text-body-secondary small">
-                          <%= work_request.starts_at.strftime("%Y/%m/%d %H:%M") %> ~
-                          <%= work_request.ends_at.strftime("%H:%M") %>
-                        </span>
-                      </div>
-                    <% end %>
-                  </div>
-                  <% else %>
-                  <p class="text-muted mb-0">勤務予定はまだ登録されていません。
-                  </p>
-                  <% end %>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる
-                  </button>
-                </div>
-            </div>
-          </div>
-        </div>
+        <%= render "shared/shift_modal",
+          staff_member: staff_member,
+          modal_id: "shiftModal-#{staff_member.id}" %>
       </div>
     <% end %>
   </div>

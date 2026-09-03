@@ -46,3 +46,20 @@ body {
   margin: 0;
   text-align: right;
 }
+
+.shift-modal-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+}
+
+.shift-modal-trigger:hover {
+  text-decoration: underline;
+}
+
+.shift-modal-trigger:focus-visible {
+  outline: var(--bs-focus-ring-width) solid var(--bs-focus-ring-color);
+}

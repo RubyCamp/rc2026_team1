@@ -1,0 +1,44 @@
+<div class="modal fade" id="<%= modal_id %>" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><%= staff_member.name %> さんのシフト</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="閉じる"></button>
+      </div>
+      <div class="modal-body">
+        <% if staff_member.availabilities.any? || staff_member.assignments.any? %>
+          <div class="list-group">
+            <% Availability.for_staff(staff_member_id: staff_member.id).each do |availability| %>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="badge <%= availability.unavailable? ? "text-bg-danger" : "text-bg-secondary" %> me-2"><%= enum_label(availability, :status) %></span>
+                  <strong><%= availability.starts_at.strftime("%Y/%m/%d") %></strong>
+                </div>
+                <span class="text-body-secondary small">
+                  <%= availability.starts_at.strftime("%H:%M") %> ~ <%= availability.ends_at.strftime("%H:%M") %>
+                </span>
+              </div>
+            <% end %>
+            <% staff_member.assignments.sort_by { |assignment| assignment.work_request.starts_at }.each do |assignment| %>
+              <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <%= render "shared/assignment_status_button", assignment: assignment %>
+                  <strong><%= assignment.work_request.title %></strong>
+                </div>
+                <span class="text-body-secondary small">
+                  <%= assignment.work_request.starts_at.strftime("%Y/%m/%d %H:%M") %> ~
+                  <%= assignment.work_request.ends_at.strftime("%H:%M") %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-muted mb-0">勤務予定はまだ登録されていません。</p>
+        <% end %>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">閉じる</button>
+      </div>
+    </div>
+  </div>
+</div>
