@@ -68,6 +68,15 @@
           <%= @work_request.assignments.size %>名
         </dd>
       </div>
+
+      <div>
+        <dt>勤務時間</dt>
+        <dd>
+          <%= l @work_request.starts_at, format: :long %>
+          〜
+          <%= l @work_request.ends_at, format: :long %>
+        </dd>
+      </div>
     </dl>
   </div>
 </section>
@@ -93,22 +102,87 @@
       現在の割当
     </h2>
 
+    <div class="border-bottom pb-4 mb-4">
+      <h3 class="h5">スタッフを仮割り当て</h3>
+      <% if @assignable_staff_members.any? %>
+        <div class="dropdown">
+          <button
+            class="btn btn-outline-primary dropdown-toggle w-100 text-start"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            スタッフを選択
+          </button>
+          <ul class="dropdown-menu w-100">
+            <% @assignable_staff_members.each do |staff_member| %>
+              <% skill_missing = staff_member.skills.none? { |skill| skill.id == @work_request.required_skill_id } %>
+              <% time_conflict = Assignment.time_conflict_for?(work_request_id: @work_request.id, staff_member_id: staff_member.id) %>
+              <li>
+                <%= button_to assign_work_request_path(@work_request),
+                  method: :post,
+                  params: { staff_member_id: staff_member.id },
+                  class: "dropdown-item d-flex justify-content-between align-items-center gap-3",
+                  form: { class: "m-0" } do %>
+                  <span>
+                    <strong><%= staff_member.name %></strong>
+                    <span class="text-body-secondary ms-2">
+                      <%= staff_member.skills.map(&:name).join("、").presence || "スキルなし" %>
+                    </span>
+                  </span>
+                  <% if skill_missing || time_conflict %>
+                    <span class="d-flex gap-1">
+                      <% if skill_missing %>
+                        <span class="badge text-bg-danger">スキル不足</span>
+                      <% end %>
+                      <% if time_conflict %>
+                        <span class="badge text-bg-danger">時間重複</span>
+                      <% end %>
+                    </span>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% else %>
+        <p class="mb-0 text-body-secondary">割り当て可能なスタッフはいません。</p>
+      <% end %>
+    </div>
+
     <% if @work_request.assignments.any? %>
       <ul class="list-group list-group-flush">
         <% @work_request.assignments.each do |assignment| %>
+          <% skill_missing = !StaffMember.skilled_for(work_request_id: @work_request.id).exists?(id: assignment.staff_member_id) %>
+          <% time_conflict = Assignment.time_conflict?(id: assignment.id) %>
+          <% has_warning = skill_missing || time_conflict %>
           <li
             class="
               list-group-item
               px-0
               d-flex
               justify-content-between
+              <%= "list-group-item-danger" if has_warning %>
               align-items-center
               gap-3
             "
           >
-            <strong>
-              <%= assignment.staff_member.name %>
-            </strong>
+            <div>
+              <strong>
+                <%= assignment.staff_member.name %>
+              </strong>
+
+              <% if has_warning %>
+                <div class="mt-1">
+                  <% if skill_missing %>
+                    <span class="badge text-bg-danger">スキル不足</span>
+                  <% end %>
+                  <% if time_conflict %>
+                    <span class="badge text-bg-danger">時間重複</span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
 
             <span class="badge text-bg-secondary">
               <%= enum_label(assignment, :status) %>
