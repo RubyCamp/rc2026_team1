@@ -37,6 +37,30 @@ class WorkRequestsController < ApplicationController
       alert: "割り当てる勤務依頼が見つかりませんでした。"
   end
 
+  def unassign
+    assignment = Assignment.find_by!(
+      id: params.expect(:assignment_id),
+      work_request_id: params[:id]
+    )
+
+    unless assignment.draft?
+      redirect_to work_request_path(params[:id]),
+        alert: "仮割り当てだけキャンセルできます。"
+      return
+    end
+
+    staff_name = assignment.staff_member.name
+    Assignment.unassign!(id: assignment.id)
+    redirect_to work_request_path(params[:id]),
+      notice: "#{staff_name}さんの仮割り当てをキャンセルしました。"
+  rescue ActionController::ParameterMissing, ActiveRecord::RecordNotFound
+    redirect_to work_request_path(params[:id]),
+      alert: "キャンセルする仮割り当てが見つかりませんでした。"
+  rescue ActiveRecord::RecordNotDestroyed => error
+    redirect_to work_request_path(params[:id]),
+      alert: error.record.errors.full_messages.to_sentence
+  end
+
   def update
     @work_request = WorkRequest.update_details!(
       id: params[:id],

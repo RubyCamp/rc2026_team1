@@ -187,6 +187,20 @@
             <span class="badge text-bg-secondary">
               <%= enum_label(assignment, :status) %>
             </span>
+
+            <% if assignment.draft? %>
+              <%= button_to "確定する",
+                confirm_list_view_path(assignment),
+                method: :patch,
+                class: "btn btn-primary btn-sm",
+                form: { class: "d-inline-block ms-auto" } %>
+              <%= button_to "キャンセル",
+                unassign_work_request_path(@work_request),
+                method: :delete,
+                params: { assignment_id: assignment.id },
+                class: "btn btn-outline-danger btn-sm",
+                form: { class: "d-inline-block", data: { turbo_confirm: "この仮割り当てをキャンセルしますか？" } } %>
+            <% end %>
           </li>
         <% end %>
       </ul>

@@ -86,6 +86,44 @@ class WorkRequestsFlowTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "詳細画面の下書き割り当てを確定またはキャンセルする" do
+    staff_member = StaffMember.create!(
+      name: "確定対象スタッフ",
+      employment_status: :active
+    )
+    StaffSkill.create!(
+      staff_member: staff_member,
+      skill: @required_skill,
+      proficiency_label: "経験あり"
+    )
+    assignment = Assignment.assign!(
+      work_request_id: @work_request.id,
+      staff_member_id: staff_member.id
+    )
+
+    get work_request_path(@work_request)
+    assert_response :success
+    assert_select "form[action=?]", confirm_list_view_path(assignment) do
+      assert_select "button", text: "確定する"
+    end
+    assert_select "form[action=?]", unassign_work_request_path(@work_request) do
+      assert_select "button", text: "キャンセル"
+    end
+
+    patch confirm_list_view_path(assignment),
+      headers: { "HTTP_REFERER" => work_request_url(@work_request) }
+
+    assert assignment.reload.confirmed?
+    assert_redirected_to work_request_path(@work_request)
+
+    assignment.draft!
+    assert_difference("Assignment.count", -1) do
+      delete unassign_work_request_path(@work_request),
+        params: { assignment_id: assignment.id }
+    end
+    assert_redirected_to work_request_path(@work_request)
+  end
+
   test "備考だけを更新して詳細画面へ戻る" do
     assert_difference("ChangeEvent.count", 1) do
       patch work_request_path(@work_request), params: {
