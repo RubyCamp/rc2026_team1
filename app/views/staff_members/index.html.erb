@@ -47,8 +47,15 @@
                 <dd>
                   <% if staff_member.availabilities.any? %>
                     <% staff_member.availabilities.each do |availability| %>
+                      <% availability_class = if availability.unavailable?
+                                                "text-bg-danger"
+                                              elsif staff_member.inactive?
+                                                "text-bg-warning"
+                                              else
+                                                "text-bg-primary"
+                                              end %>
                       <span
-                        class="badge <%= availability.available? ? "text-bg-primary" : "text-bg-danger" %>"
+                        class="badge <%= availability_class %>"
                         aria-label="<%= enum_label(availability, :status) %>"
                         title="<%= enum_label(availability, :status) %>"
                       >
