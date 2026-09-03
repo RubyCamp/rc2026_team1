@@ -45,15 +45,19 @@
               <div>
                 <dt>勤務予定</dt>
                 <dd>
-                  <%= staff_member.availabilities
-                        .map do |availability|
-                          enum_label(
-                            availability,
-                            :status
-                          )
-                        end
-                        .join("、")
-                        .presence || "未登録" %>
+                  <% if staff_member.availabilities.any? %>
+                    <% staff_member.availabilities.each do |availability| %>
+                      <span
+                        class="badge <%= availability.available? ? "text-bg-primary" : "text-bg-danger" %>"
+                        aria-label="<%= enum_label(availability, :status) %>"
+                        title="<%= enum_label(availability, :status) %>"
+                      >
+                        <%= availability.available? ? "○" : "×" %>
+                      </span>
+                    <% end %>
+                  <% else %>
+                    未登録
+                  <% end %>
                 </dd>
               </div>
             </dl>
